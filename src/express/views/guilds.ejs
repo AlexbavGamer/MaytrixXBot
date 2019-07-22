@@ -1,0 +1,24 @@
+<div class="res-tab">
+    <table>
+        <tbody>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Membros</th>
+                <th>Comandos</th>
+                <th>Dono</th>
+                <th>Ações</th>
+            </tr>
+            <% data.guilds.forEach(guild => { %>
+            <tr>
+                <td><%= guild.id %></td>
+                <td><%= guild.name %></td>
+                <td><%= guild.members.size %></td>
+                <td><%= (data.commands.has(guild.id) ? data.commands.get(guild.id).length : 0); %></td>
+                <td><%=guild.owner.user.username%></td>
+                <td></td>
+            </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>

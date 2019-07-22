@@ -1,0 +1,22 @@
+<a href="/guilds/newcommand" class="btn btn-primary">Novo Comando</a>
+Comandos: <%= data.commands.length %>
+<div class="res-tab">
+    <table>
+        <tbody>
+            <tr>
+                <th>ID</th>
+                <th>Comando</th>
+                <th>Guilda</th>
+                <th>Ativado</th>
+            </tr>
+            <% data.commands.forEach((cmd) => { %>
+            <tr>
+                <td><%= cmd._id %></td>
+                <td><%= cmd.filename %></td>
+                <td><%= data.guilds.get(cmd.guildid).name %></td>
+                <td><%= cmd.enabled %></td>
+            </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>

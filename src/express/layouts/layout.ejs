@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title><%= settings.title %> - <%= main.title %></title>
+        <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:700, 600,500,400,300' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+        <link rel="stylesheet" type="text/css" href="/scss/main.css">
+
+        <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+        <script src="https://code.highcharts.com/highcharts.js"></script>
+        <script src="https://code.highcharts.com/modules/data.js"></script>
+        <script src="https://kit.fontawesome.com/100e7c6fc2.js"></script>
+        <script src="/js/main.js"></script>
+    </head>
+    <body>
+        <div class="header">
+            <div class="logo">
+                <i class="fab fa-discord"></i>
+                <span><%= settings.title %></span>
+            </div>
+            <a href="#" class="nav-trigger"><span></span></a>
+        </div>
+        <div class="left-logo">
+            <% if(!req.isAuthenticated()) { %>
+            <div class="discord">
+                <a class="btn btn-primary" href="/auth/discord/callback">Entrar</a>
+            </div>
+            <% } %>
+        </div>
+        <div class="side-nav">
+            <div class="logo">
+                <i class="fab fa-discord"></i>
+                <span><%= settings.title %></span>
+            </div>
+            <nav>
+                <ul>
+                    <li>
+                        <a href="/">
+                            <span><i class="fa fa-home"></i></span>
+                            <span>Dashboard</span> 
+                        </a>
+                    </li>
+                    <% if(req.isAuthenticated()) { %>
+                    <li>
+                        <a href="/guilds">
+                            <span><i class="fab fa-discord"></i></span>
+                            <span>Servidores</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/commands">
+                            <span><i class="fa fa-terminal"></i></span>
+                            <span>Comandos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/settings">
+                            <span><i class="fa fa-wrench"></i></span>
+                            <span>Configurações</span>
+                        </a>
+                    </li>
+                    <li> 
+                        <a href="/logout">
+                            <span><i class="fa fa-sign-out"></i></span>
+                            <span>Sair</span>
+                        </a>
+                    </li>
+                    <% } %>
+                </ul>
+            </nav>
+        </div>
+        <div class="main-content">
+            <div class="title">
+                <%= main.title %>
+                <% if(req.isAuthenticated()) { %>
+                    <span class="path"></span>
+                <% } %>
+            </div>
+            <div class="main">
+                <%- body %>
+            </div>
+        </div>
+
+    </body>
+</html>

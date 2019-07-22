@@ -1,0 +1,107 @@
+<%- contentFor('body') %>
+
+<link rel="stylesheet" data-name="vs/editor/editor.main" href="/node_modules/monaco-editor/min/vs/editor/editor.main.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<!-- <form method="POST" name="newCommand" action="/newcommand" > -->
+<table>
+    <tr>
+        <td>
+            Nome do Arquivo:
+        </td>
+        <br>
+        <td>
+            <input type="text" id="filename" name="filename">
+        </td>
+        <td>
+            <label for="guilds"><span>Seleciona a</span> <b>Guilda</b>:</label>
+            <select id="guilds" name="guilds">
+                <% data.guilds.forEach(guild => { %>
+                    <option value="<%=guild.id%>"><%=guild.name%></option>
+                <% }); %>
+            </select>
+        </td>
+
+        <td>
+            <input type="button" value="Criar" onclick="createCommand()">
+        </td>
+        <div id="container" style="width:500px;height:300px;border:1px solid grey"></div>
+    </tr>
+</table>
+<!-- </form> -->
+<script src="/node_modules/monaco-editor/min/vs/loader.js"></script>
+<script>
+    
+    function createCommand()
+    {
+        $.ajax({ url: '/newcommand', type: 'POST', data:{
+            code: editor.getModel().getLinesContent(),
+            guildid: document.getElementById('guilds').value,
+            filename: 'typescript.ts',
+            enabled: true
+        }});
+    }
+    require.config({
+        baseUrl: '/node_modules/monaco-editor/min'
+    });
+    var editor;
+    require(['vs/editor/editor.main'], function()
+    {
+
+        monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+            target: monaco.languages.typescript.ScriptTarget.ES6,
+	        allowNonTsExtensions: true
+        });
+
+        monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+            target: monaco.languages.typescript.ScriptTarget.ES2016,
+            allowNonTsExtensions: true,
+            module: monaco.languages.typescript.ModuleKind.CommonJS,
+            noEmit: true
+        });
+
+        var n;
+        var f;
+        console.clear();
+        <% data.dependencies.forEach((value, key) => { %>
+            n = <%- JSON.stringify(value) %>
+            f = <%- JSON.stringify(key) %>
+            monaco.languages.typescript.typescriptDefaults.addExtraLib(n, f)
+        <% }) %>
+
+        // extra libraries
+
+        var jsCode = [
+            '"use strict";',
+            '',
+            "class Chuck implements ICommand {",
+            "    greet() {",
+            "        return Facts.next();",
+            "    }",
+            "}"
+        ].join('\n');
+
+        editor = monaco.editor.create(document.getElementById("container"), {
+            model: monaco.editor.createModel(jsCode,"typescript"), 
+        });
+
+        editor.addAction({
+            id: "get-mirror-model-uris",
+            label: "Debug monaco: Get worker models",
+            run: () => {
+                const modelUri = editor.getModel().uri.toString();
+                const ts = monaco.languages.typescript;
+                ts.getTypeScriptWorker().then(worker => {
+                    return worker(modelUri);
+                }).then(worker => {
+                    return worker.getScriptFileNames();
+                }).then(files => {
+                    alert("Worker file names:\n" + files.join("\n"));
+                });
+            }
+        });
+
+    });
+
+
+</script>
+

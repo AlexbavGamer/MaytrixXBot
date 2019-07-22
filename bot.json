@@ -1,0 +1,20 @@
+{
+    "game": "",
+    "prefix": "!",
+    "creatorId": "203936190133436416",
+    "token": "NTc0Mjc3NjE2MjcwMzExNDQ2.XTUAsA.Mep3HNnvg3ftfl5qPz5cgDzoo4E",
+    "clientId": "574277616270311446",
+    "clientSecret": "PIMY13WxPiPG8wgSv1aQmZoPLexUCDxX",
+    "Mongoose":
+    {
+        "enabled": true,
+        "url": "mongodb://admin:001998Br@ds231207.mlab.com:31207/discordbot"
+    },
+    "cookie":{
+        "key": "mykeyissecret"
+    },
+    "activitys":
+    [
+        "`Estou online em ${this.client.client.guilds.size} servidores`"
+    ]
+}

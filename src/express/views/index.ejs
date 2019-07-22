@@ -1,0 +1,9 @@
+<%- contentFor('body') %>
+
+<div class="jumbotron text-center">
+    <% if(req.isAuthenticated()) { %>
+        <p><%=req.user.username%>, <b>bem vindo de volta!</b></p>
+    <% } else { %>
+        <p>Olá <b>Usuario</b> logue-se para usar o <b><%= settings.title %></b></p>
+    <% } %>
+</div>

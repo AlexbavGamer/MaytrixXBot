@@ -22,7 +22,7 @@ export default class HelpCommand extends Command
                 name: "help",
                 description: "get help from commands",
                 usage: "<>",
-                category: ""
+                category: "Util"
             }
         });
     }

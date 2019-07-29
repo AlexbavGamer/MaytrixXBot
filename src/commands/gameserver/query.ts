@@ -9,7 +9,7 @@ export default class HelpCommand extends Command
             aliases: ["q"],
             allowDMs: false,
             cooldown: 1000,
-            autodelete: false,
+            autodelete: 1000,
             permission: {
                 level: "READ_MESSAGES",
                 creatorOnly: false,
@@ -26,6 +26,12 @@ export default class HelpCommand extends Command
 
     async run(message : Message, args : string[])
     {
-        message.reply("este comando não está pronto ainda.");
+        message.reply("este comando não está pronto ainda.").then(message => {
+            if(this.conf.autodelete!)
+            {
+                const num : Number = (<Number>this.conf.autodelete!.valueOf());
+                (<Message>message).delete(num.valueOf());
+            }
+        });
     }
 }

@@ -24,7 +24,7 @@ export default class extends Command
                 name: "restart",
                 category: "admin",
                 description: "restart bot (creatorOnly)",
-                usage: ""
+                usage: "<time>"
             }
         });
     }
@@ -33,13 +33,15 @@ export default class extends Command
     {
         const token = this.client.config.token;
         
-        message.channel.send("Bot Reiniciando em 15 segundos!").then((value : Message | Message[]) => {
+        const time = Date.now();
+        message.channel.send(`Bot Reiniciando!`).then((value : Message | Message[]) => {
             const msg = <Message>value;
             setTimeout(() => 
             {
-                msg.edit("Bot reiniciado!");
+                const timeNow = Math.floor((Date.now() - time) / 1000);
+                msg.edit(`Bot reiniciado! (Levou ${timeNow >= 60 ? (timeNow / 60) : (timeNow)} ${(timeNow) > 60 ? "Minutos" : "Segundos"})`);
                 this.client.restart();
-            }, 5000);
+            }, (this.client.config.restartTime! * 1000));
         });
 
         

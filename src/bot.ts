@@ -1,6 +1,7 @@
 import * as discord from 'discord.js'
 import * as path from 'path'
-import { IBot, IBotConfig, ILogger, fileWalker, Command, CommandReaction, Inner, Event } from './api'
+import { IBot, ILogger, fileWalker, Command, CommandReaction, Event } from './api'
+import { IBotConfig } from "iBotConfig";
 import { Connect } from './mongoose/Connect';
 import CommandModel from './mongoose/schemas/Command.model';
 import * as Mongoose from 'mongoose';
@@ -97,12 +98,27 @@ export class Bot implements IBot {
 
         this._client.login(this._config.token);
 
+        
         this.express = new ExpressHost(this);
         this.express.start();
 
         if (config.Mongoose.enabled) {
             this.mongoose = new Connect(this.config.Mongoose.url);
         }
+
+        setTimeout(() => {
+            console.log(`Commands: ${this.commands.size}`)
+            this.commands.forEach(command => {
+                var existCategory = this._commandreactions.has(command.conf.help.category);
+                if (existCategory) {
+                    const reactionList = this._commandreactions.get(command.conf.help.category);
+                    if (reactionList!.category == command.conf.help.category) {
+                        reactionList!.commands!.set(command.conf.help.name, command);
+                        this._commandreactions.set(command.conf.help.category, reactionList!);
+                    }
+                }
+            });
+        }, 1000);
     }
 
     private loadEvents(eventsPath: string) {
@@ -142,30 +158,27 @@ export class Bot implements IBot {
         return "";
     }
 
-    private loadCommands(commandsPath : string)
-    {
+    private loadCommands(commandsPath: string) {
         fileWalker(commandsPath, (err, files) => {
-            if(err) return console.log(err);
-            
+            if (err) return console.log(err);
+
             files!.forEach(file => {
                 var basePath = path.dirname(file);
                 var ext = path.extname(file);
 
-                if(ext == ".ts")
-                {
+                if (ext == ".ts") {
                     const cmdClass = require(file).default;
                     const command = new cmdClass(this) as Command;
                     this.commands.set(command.conf.help.name, command);
                     command.conf.aliases.forEach(a => this._aliases.set(a, command.conf.help.name));
-                    
+
                     //emoji category
-                    if(!this._commandreactions.has(command.conf.help.category))
-                    {
+                    var existCategory = this._commandreactions.has(command.conf.help.category);
+                    if (!existCategory) {
                         exists(path.join(basePath, "emote.txt"), (exists) => {
-                            if(exists)
-                            {
-                                readFile(path.join(basePath, "emote.txt"), {encoding: 'utf8'}, (err, content) => {
-                                    if(err) return console.log(err);
+                            if (exists) {
+                                readFile(path.join(basePath, "emote.txt"), { encoding: 'utf8' }, (err, content) => {
+                                    if (err) return console.log(err);
                                     const reaction = <CommandReaction>{
                                         category: command.conf.help.category,
                                         reaction: content,
@@ -176,11 +189,6 @@ export class Bot implements IBot {
                                 });
                             }
                         });
-                    }
-                    else
-                    {
-                        const reaction = this._commandreactions.get(command.conf.help.category);
-                        reaction!.commands!.set(command.conf.help.name, command);
                     }
                     this._logger.info(`Comando ${command.conf.help.name} carregado`);
                 }

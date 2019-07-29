@@ -1,4 +1,4 @@
-import { Event, IBot, Inner } from "../api";
+import { Event, IBot, CodeBlock } from "../api";
 import * as Discord from 'discord.js';
 export default class Message extends Event
 {
@@ -26,19 +26,25 @@ export default class Message extends Event
         {
 			if(message.member.hasPermission(cmd.conf.permission.level))
             {
-				cmd.setMessage(message);
-				cmd.run(message, args);
-            
-                if(cmd.conf.autodelete)
+                const {optional, required} = cmd.checkUsage(message);
+                if(args.length > optional.length)
                 {
-                    message.delete(<number>cmd.conf.autodelete);
+                    cmd.setMessage(message);
+                    cmd.run(message, args);
                 }
-
-				if(cmd.conf.cooldown > 0) cmd.startCooldown(message.author);
+                else if(args.length >= (required.length))
+                {
+                    cmd.setMessage(message);
+                    cmd.run(message, args);
+                }
+                else
+                {
+                    message.channel.send(`\`\`\`[*] REQUIRED | <*> OPTIONAL\`\`\`\n\tUsage: ${this.client.config.prefix}${command} ${cmd.conf.help.usage}`);
+                }
 			}
 			else
             {
-				message.channel.send(`Desculpe ${message.author} mas você não tem a permissão ${Inner(cmd.conf.permission.level.toString())} para executar esse comando`);
+				message.channel.send(`Desculpe ${message.author} mas você não tem a permissão ${CodeBlock(cmd.conf.permission.level.toString())} para executar esse comando`);
 			}
         }
         else
@@ -56,7 +62,7 @@ export default class Message extends Event
                 }
                 else
                 {
-                    message.channel.send(`Desculpe ${message.author} mas você não tem a permissão ${Inner(cmd.conf.permission.level.toString())} para executar esse comando`);
+                    message.channel.send(`Desculpe ${message.author} mas você não tem a permissão ${CodeBlock(cmd.conf.permission.level!.toString(), 'txt')} para executar esse comando`);
                 }
             }
             else

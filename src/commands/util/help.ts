@@ -1,4 +1,4 @@
-import { IBot, Command, IBotCommandConfig, IBotMessage } from '../../api'
+import { IBot, Command, IBotCommandConfig, IBotMessage, CodeBlock, DoubleQuotes } from '../../api'
 import { Message, Client, CategoryChannel, DiscordAPIError, RichEmbed, MessageReaction, ReactionEmoji, User, ReactionCollector, ReactionCollectorOptions, Emoji } from 'discord.js';
 import { SSL_OP_NETSCAPE_DEMO_CIPHER_CHANGE_BUG } from 'constants';
 export default class HelpCommand extends Command 
@@ -21,7 +21,7 @@ export default class HelpCommand extends Command
             {
                 name: "help",
                 description: "get help from commands",
-                usage: "<>",
+                usage: "<name>",
                 category: "Util"
             }
         });
@@ -80,7 +80,7 @@ export default class HelpCommand extends Command
             {
                 if(element.category != "")
                 {
-                    description += `${element.reaction} - ${element.category}\n`;
+                    description += `${element.reaction} - ${element.category}(${element.commands!.size})\n`;
                 }
             });
             description += '\n\nClique em uma dessas para acessar';
@@ -97,12 +97,35 @@ export default class HelpCommand extends Command
             });
             const map = this.client.commandreactions.map((react) => react.reaction);
            
-            const filter = (reaction : MessageReaction, user : User) => !map.includes(reaction.emoji.id)  && user.id == message.author.id;
+            //const filter = (reaction : MessageReaction, user : User) =>  !map.includes(reaction.emoji.id)  && user.id == message.author.id;
+            const filter = (reaction : MessageReaction, user : User) =>
+            {
+                return map.includes(reaction.emoji.name) && user.id == message.author.id;
+            }
 
-            await message.awaitReactions(filter, { time: 5000, max: 1}).then(collected => {
-                console.log(collected.size);
-            }).catch((err) => {
-                if(err) return console.log(`Error: ${err}`)
+            this.client.commandreactions.forEach(reactionList => {
+                console.warn(`${reactionList.category}:${reactionList.commands!.size}`);
+            });
+
+            sentMessage.awaitReactions(filter, {max: 1, time: 15000, errors: ['time']}).then(collected => {
+                const reaction = collected.first();
+
+                var commandsFromReact = this.client.commandreactions.filter((value) => value.reaction!.toString() == reaction.emoji.name);
+                var _list : string[] = new Array<string>();
+                commandsFromReact.forEach((reactions) => {
+                    reactions.commands!.forEach((cmd) => 
+                    {
+                        var info = '```';
+                        info += `${cmd.conf.help.name}: ${cmd.conf.help.usage}` + "\n";
+                        info += `Descrição:\n`;
+                        info += `\t${cmd.conf.help.description}` + "\n";
+                        info += `Permissão:\n`;
+                        info += `\t` + (message.member.hasPermission(cmd.conf.permission.level) ? "SIM" : "NÂO") + "\n";
+                        info += "```";
+                        _list.push(info);
+                    });
+                });
+                sentMessage.channel.send(_list.join('\n'));
             });
         }
     }

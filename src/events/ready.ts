@@ -1,9 +1,11 @@
 import { Event, IBot, Eval } from "../api";
-import { Message } from "discord.js";
+import { Message, Guild, Collection } from "discord.js";
 import { inspect } from "util";
+import { read } from "fs";
 
 export default class Ready extends Event
 {
+    static servers: any;
     constructor(client : IBot)
     {
         super(client);
@@ -30,5 +32,6 @@ export default class Ready extends Event
         }
         this.client.client.user.setStatus('online')
         this.client.logger.info('started...')
+        Ready.servers = {}
     }
 }

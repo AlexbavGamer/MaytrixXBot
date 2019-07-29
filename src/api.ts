@@ -9,10 +9,7 @@ import { inspect } from "util";
 import passport2 = require('passport-discord');
 import passportDiscord = require('passport-discord');
 import Strategy = passportDiscord.Strategy;
-const refresh = require('passport-oauth2-refresh');
-import { Mongoose } from "mongoose";
-import childProcess = require('child_process');
-import restart from "./commands/admin/restart";
+import { IBotConfig } from "iBotConfig";
 export interface ILoggerMethod {
     (msg: string, ...args: any[]): void
     (obj: object, msg?: string, ...args: any[]): void
@@ -113,26 +110,6 @@ export interface ILogger {
     error: ILoggerMethod
 }
 
-export interface IBotConfig {
-    token: string
-    prefix: string
-    creatorId: string
-    game?: string
-    username?: string
-    clientId?: string
-    Mongoose:
-    {
-        enabled: boolean
-        url: string
-    }
-    cookie:
-    {
-        key: string
-    }
-    clientSecret?: string
-    activitys?: string[]
-}
-
 export interface IBotCommandConfig
 {
     cooldown: number | 1000
@@ -187,9 +164,18 @@ export abstract class Event
     }
 }
 
-export function Inner(inner: string)
+export function DoubleQuotes(text: string)
 {
-    return `\`\`${inner}\`\``;
+    return "||" + text + "||";
+}
+
+export function CodeBlock(text: string, type?: string)
+{
+    if(type!)
+    {
+        return "```" + `${type}` + text + "```";
+    }
+    return "```" + text + "```";
 }
 export abstract class Command
 {
@@ -224,6 +210,26 @@ export abstract class Command
     respond(message : any)
     {
         this.message.channel.send(message);   
+    }
+
+    checkUsage(message : Message)
+    {
+        let usages = this.conf.help.usage.split(" ");
+        var required : string[] = [];
+        var optional : string[] = [];
+        for(var usage of usages)
+        {
+            if(usage.startsWith("[") && usage.endsWith("]"))
+            {
+                required.push(usage.replace("[", "").replace("]", ""));
+            }
+            else if(usage.startsWith("<") && usage.endsWith(">"))
+            {
+                optional.push(usage.replace("<", "").replace(">", ""));
+            }
+        }
+
+        return {required, optional};
     }
 
     run(message : Message, args: string[])

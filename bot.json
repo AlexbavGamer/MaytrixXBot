@@ -5,11 +5,13 @@
     "token": "NTc0Mjc3NjE2MjcwMzExNDQ2.XTUAsA.Mep3HNnvg3ftfl5qPz5cgDzoo4E",
     "clientId": "574277616270311446",
     "clientSecret": "PIMY13WxPiPG8wgSv1aQmZoPLexUCDxX",
+    "youtubeapi": "AIzaSyB59Xg9vt1nR0GmC311t6W5k1kaPzvbfWk",
     "Mongoose":
     {
         "enabled": true,
         "url": "mongodb://admin:001998Br@ds231207.mlab.com:31207/discordbot"
     },
+    "restartTime": 120,
     "cookie":{
         "key": "mykeyissecret"
     },

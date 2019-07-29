@@ -3,6 +3,6 @@ export class Connect
 {
     constructor(connection_url : string)
     {
-        mongoose.connect(connection_url, {useNewUrlParser: true});
+        mongoose.connect(connection_url, {useNewUrlParser: true, useCreateIndex: true});
     }
 }

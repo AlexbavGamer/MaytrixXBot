@@ -22,26 +22,29 @@ export default class EvalCommand extends Command
                 name: "eval",
                 category: "admin",
                 description: "Execute TypeScript Code or JavaScript Code",
-                usage: "<code>"
+                usage: "[code]"
             }
         });
-        this.forbidden_evals.set("this.client._config", true); 
+        this.forbidden_evals.set("this.client.config", true); 
     }
 
     async run(message : Message, args : Array<string>)
     {
         let toEval = args.join(" ");
         let evaluted = inspect(eval(toEval), { depth: 0});
+
+        let forbiddens = this.forbidden_evals.map((b, key) => b ? key : undefined);
+
+        for(var forbidden of forbiddens)
+        {
+            if(forbidden!.includes(toEval))
+            {
+                return message.channel.send("Não foi possivel executar: ``ESSE CODIGO NÂO È PERMITIDO``");
+            }
+        }
+
         try
         {
-            this.forbidden_evals.forEach((boolean, key) => 
-            {
-                if(key.includes(toEval)  && boolean || !(message.author.id == this.client.config.creatorId))
-                {
-                    return message.channel.send("Não foi possivel executar: ``ESSE CODIGO NÂO È PERMITIDO``");
-                }
-            });
-
             if(!toEval)
             {
                 message.channel.send("Não foi possivel executar: ``não posso executar nenhum codigo``");

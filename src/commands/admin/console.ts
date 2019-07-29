@@ -23,7 +23,7 @@ export default class extends Command
                 name: "c",
                 category: "admin",
                 description: "Execute TypeScript Code or JavaScript Code",
-                usage: "<code>"
+                usage: "[code]"
             }
         });
     }

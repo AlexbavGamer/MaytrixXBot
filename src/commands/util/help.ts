@@ -76,7 +76,7 @@ export default class HelpCommand extends Command
 
 
             var description = '';
-            var promises = this.client.commandreactions.map((element) => 
+            this.client.commandreactions.map((element) => 
             {
                 if(element.category != "")
                 {
@@ -97,7 +97,6 @@ export default class HelpCommand extends Command
             });
             const map = this.client.commandreactions.map((react) => react.reaction);
            
-            //const filter = (reaction : MessageReaction, user : User) =>  !map.includes(reaction.emoji.id)  && user.id == message.author.id;
             const filter = (reaction : MessageReaction, user : User) =>
             {
                 return map.includes(reaction.emoji.name) && user.id == message.author.id;

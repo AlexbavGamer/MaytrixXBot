@@ -1,1 +1,1 @@
-worker: npm run dev
+worker: ts-node-dev --respawn src/index.ts

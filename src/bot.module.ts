@@ -2,13 +2,8 @@ import * as discord from 'discord.js'
 import * as path from 'path'
 import { IBot, ILogger, fileWalker, Command, CommandReaction, Event } from './api'
 import { IBotConfig } from "iBotInterfaces";
-import { Connect } from './mongoose/Connect';
-import CommandModel from './mongoose/schemas/Command.model';
-import * as Mongoose from 'mongoose';
 import ExpressHost from './ExpressHost';
-import { log } from 'util';
 import { readFile, exists } from 'fs';
-import { stringify } from 'querystring';
 
 export class Bot implements IBot {
     getCommandsFromCategory(Category: string): Command[] {
@@ -70,7 +65,6 @@ export class Bot implements IBot {
     private _logger!: ILogger
     private _botId!: string
     private express!: ExpressHost;
-    private mongoose!: Connect;
 
     public restart(): Promise<void> {
         return new Promise<void>(() => {
@@ -98,12 +92,10 @@ export class Bot implements IBot {
 
         this._client.login(this._config.token);
 
-        
         this.express = new ExpressHost(this);
         this.express.start();
 
         if (config.Mongoose.enabled) {
-            this.mongoose = new Connect(this.config.Mongoose.url);
         }
 
 
@@ -124,27 +116,14 @@ export class Bot implements IBot {
                 this._client.on(eventName, (...args: Array<any>) => {
                     event.on(...args);
                 });
+                delete require.cache[file];
             });
         }, [".ts"]);
     }
 
-    public registerCustomCommand(guildid: Number, codeArray: [string]) {
-        const command = new CommandModel(
-            {
-                _id: Mongoose.Types.ObjectId(),
-                filename: "tmp.ts",
-                code: codeArray,
-                enabled: true,
-            }).save();
+    public registerCustomCommand() {
     }
 
-    private readEmote(path: string, cb: Function) {
-        readFile(path, { encoding: "utf8" }, (err, data) => {
-            if (err) return cb(err, null);
-            return cb(null, data);
-        });
-        return "";
-    }
 
     private loadCommands(commandsPath: string) {
         fileWalker(commandsPath, (err, files) => {
@@ -155,6 +134,7 @@ export class Bot implements IBot {
                 var ext = path.extname(file);
 
                 if (ext == ".ts") {
+                    delete require.cache[file];
                     const cmdClass = require(file).default;
                     const command = new cmdClass(this) as Command;
                     this.commands.set(command.conf.help.name, command);

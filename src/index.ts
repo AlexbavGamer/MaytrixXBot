@@ -1,6 +1,6 @@
 import { IBot, ILogger } from './api'
 import { IBotConfig } from "iBotInterfaces";
-import { Bot } from "./Bot";
+import { Bot } from './bot.module';
 
 const logger: ILogger = console
 
@@ -12,4 +12,4 @@ try {
     logger.info('no production config found...')
 }
 
-new Bot().start(logger, cfg, `${__dirname}/commands`, `${__dirname}/events`)
+new Bot().start(logger, cfg, `${__dirname}/commands`, `${__dirname}/events`);

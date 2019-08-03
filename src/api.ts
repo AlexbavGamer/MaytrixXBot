@@ -173,7 +173,7 @@ export function CodeBlock(text: string, type?: string)
 {
     if(type!)
     {
-        return "```" + `${type}` + text + "```";
+        return "```" + `${type}\n` + text + "```";
     }
     return "```" + text + "```";
 }

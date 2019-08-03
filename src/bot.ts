@@ -1,7 +1,7 @@
 import * as discord from 'discord.js'
 import * as path from 'path'
 import { IBot, ILogger, fileWalker, Command, CommandReaction, Event } from './api'
-import { IBotConfig } from "iBotConfig";
+import { IBotConfig } from "iBotInterfaces";
 import { Connect } from './mongoose/Connect';
 import CommandModel from './mongoose/schemas/Command.model';
 import * as Mongoose from 'mongoose';

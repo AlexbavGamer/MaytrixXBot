@@ -9,8 +9,7 @@ import { inspect } from "util";
 import passport2 = require('passport-discord');
 import passportDiscord = require('passport-discord');
 import Strategy = passportDiscord.Strategy;
-import { IBotConfig } from "iBotConfig";
-import { CommandInterface } from "iBotInterfaces";
+import { CommandInterface , IBotConfig} from "iBotInterfaces";
 export interface ILoggerMethod {
     (msg: string, ...args: any[]): void
     (obj: object, msg?: string, ...args: any[]): void

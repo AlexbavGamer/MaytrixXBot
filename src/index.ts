@@ -1,5 +1,5 @@
 import { IBot, ILogger } from './api'
-import { IBotConfig } from "iBotConfig";
+import { IBotConfig } from "iBotInterfaces";
 import { Bot } from "./Bot";
 
 const logger: ILogger = console

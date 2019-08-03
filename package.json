@@ -1,6 +1,10 @@
 {
     "name": "discordbot-ts",
     "version": "1.0.5",
+    "engines":
+    {
+        "node": "10.16.1"
+    },
     "description": "Simple discord bot",
     "main": "dist/index.js",
     "scripts": {

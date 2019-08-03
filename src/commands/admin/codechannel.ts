@@ -3,7 +3,7 @@ import {collectMessage, onCollectMessage, denyAll, allowAll} from '../../utils';
 import { Message, Client, CategoryChannel, DiscordAPIError, RichEmbed, MessageReaction, Collection, Collector, PermissionResolvable, TextChannel, PermissionObject } from 'discord.js';
 import { inspect, promisify, isNull } from 'util';
 const wait = promisify(setTimeout);
-export default class EvalCommand extends Command 
+export default class CodeChannelCommand extends Command 
 {
     forbidden_evals : Collection<string, boolean> = new Collection();
     constructor(client : IBot)
@@ -37,6 +37,10 @@ export default class EvalCommand extends Command
         const member = message.author;
         const filterChannelName = `${name}-commands`;
 
+        guild.channels.filter(f => f.name == filterChannelName).forEach(channel => {
+            message.channel.send(channel.name);
+        });
+
         wait(1000);
 
         guild.createChannel(filterChannelName, 'text').then(channel => 
@@ -48,24 +52,24 @@ export default class EvalCommand extends Command
                 permissions: ["VIEW_CHANNEL"],
                 name: `${name}'s Role`,
                 hoist: true,
-                mentionable: false,
+                mentionable: false
             }).then(role => 
             {
                 const roles = guild.roles.map((role) => role.name);
-                const everyoneRole = guild.roles.find(r => r.name == "@everyone");
+                const everyoneRole = guild.defaultRole;
                 channel.overwritePermissions(everyoneRole, denyAll);
                 channel.overwritePermissions(role, allowAll);
                 
-                const myRole = message.member.roles.find("name", role.name);
-                if(!myRole)
+                const myRole = message.member.roles.find("id", role.id);
+
+                if(myRole)
                 {
-                    message.member.addRole(myRole);
+                    message.member.removeRole(myRole);
                 }
+                message.member.addRole(myRole);
             });
             const txtChannel = <TextChannel>channel;
-            const sentMessage = txtChannel.send(`${member} Digite qualquer codigo em linguagem TypeScript ou JavaScript que eu irei executar.\n\nNote: Tem algumas funções que está proibida`,{
-
-            });
+            const sentMessage = txtChannel.send(`${member} Digite qualquer codigo em linguagem TypeScript ou JavaScript que eu irei executar.\n\nNote: Tem algumas funções que está proibida`);
             sentMessage.then(newMessage => {
                 (<Message>newMessage).pin();
             })
@@ -74,6 +78,7 @@ export default class EvalCommand extends Command
             {
                 if(m.content == "run")
                 {
+					m.delete();
                     var code = codes.join("\n");
                     let evaluted = inspect(eval(code), {depth: 0 });
                     try{

@@ -1,5 +1,8 @@
 import { IUser } from './api'
 import { Message, User, MessageReaction, Collector, PermissionObject, TextChannel } from 'discord.js';
+import { promisify } from 'util';
+
+const wait = promisify(setTimeout);
 
 export const getRandomInt = (min: number, max: number): number => {
     return Math.floor(min + Math.random() * (max - min + 1))
@@ -24,7 +27,10 @@ export function collectMessage(channel : TextChannel, user : User, onCollect : o
         onCollect(m);
     });
 
-    collector.on("end", (m) => {
+    collector.on("end", (m) => 
+    {
+        channel.send(`Deletando canal em 5 segundos`);
+        wait(5000);
         channel.delete();
     });
 

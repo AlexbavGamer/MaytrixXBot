@@ -90,11 +90,12 @@ export default class HelpCommand extends Command
             
             const sentMessage = await (<Promise<Message>>message.channel.send(embed));
 
-            this.client.commandreactions.forEach(cmdReactions => 
+            this.client.commandreactions.map(async(element) => 
             {
-                if(cmdReactions.reaction)
-                        sentMessage.react(cmdReactions.reaction!.toString());
+                if(element.reaction)
+                        await sentMessage.react(element.reaction!.toString());
             });
+
             const map = this.client.commandreactions.map((react) => react.reaction);
            
             const filter = (reaction : MessageReaction, user : User) =>

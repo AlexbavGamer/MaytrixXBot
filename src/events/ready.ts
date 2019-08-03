@@ -33,5 +33,17 @@ export default class Ready extends Event
         this.client.client.user.setStatus('online')
         this.client.logger.info('started...')
         Ready.servers = {}
+
+        this.client.commands.forEach(command =>
+        {
+            var existCategory = this.client.commandreactions.has(command.conf.help.category);
+            if (existCategory) {
+                const reactionList = this.client.commandreactions.get(command.conf.help.category);
+                if (reactionList!.category == command.conf.help.category) {
+                    reactionList!.commands!.set(command.conf.help.name, command);
+                    this.client.commandreactions.set(command.conf.help.category, reactionList!);
+                }
+            }
+        });
     }
 }

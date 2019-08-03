@@ -106,19 +106,7 @@ export class Bot implements IBot {
             this.mongoose = new Connect(this.config.Mongoose.url);
         }
 
-        setTimeout(() => {
-            console.log(`Commands: ${this.commands.size}`)
-            this.commands.forEach(command => {
-                var existCategory = this._commandreactions.has(command.conf.help.category);
-                if (existCategory) {
-                    const reactionList = this._commandreactions.get(command.conf.help.category);
-                    if (reactionList!.category == command.conf.help.category) {
-                        reactionList!.commands!.set(command.conf.help.name, command);
-                        this._commandreactions.set(command.conf.help.category, reactionList!);
-                    }
-                }
-            });
-        }, 1000);
+
     }
 
     private loadEvents(eventsPath: string) {

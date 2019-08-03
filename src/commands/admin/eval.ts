@@ -1,6 +1,8 @@
-import { IBot, Command, IBotCommandConfig, IBotMessage } from '../../api'
-import { Message, Client, CategoryChannel, DiscordAPIError, RichEmbed, MessageReaction, Collection } from 'discord.js';
-import { inspect } from 'util';
+import { IBot, Command, IBotCommandConfig, IBotMessage, Eval } from '../../api'
+import {collectMessage, onCollectMessage, denyAll, allowAll} from '../../utils';
+import { Message, Client, CategoryChannel, DiscordAPIError, RichEmbed, MessageReaction, Collection, Collector, PermissionResolvable, TextChannel, PermissionObject } from 'discord.js';
+import { inspect, promisify, isNull } from 'util';
+const wait = promisify(setTimeout);
 export default class EvalCommand extends Command 
 {
     forbidden_evals : Collection<string, boolean> = new Collection();
@@ -8,7 +10,7 @@ export default class EvalCommand extends Command
     {
         super(client, 
         {
-            aliases: ["e", "executar"],
+            aliases: ["cc"],
             allowDMs: false,
             cooldown: 1000,
             autodelete: false,
@@ -19,10 +21,10 @@ export default class EvalCommand extends Command
             },
             help:
             {
-                name: "eval",
+                name: "codechannel",
                 category: "admin",
-                description: "Execute TypeScript Code or JavaScript Code",
-                usage: "[code]"
+                description: "Create a Channel only you cant access and execute commands",
+                usage: ""
             }
         });
         this.forbidden_evals.set("this.client.config", true); 
@@ -30,41 +32,98 @@ export default class EvalCommand extends Command
 
     async run(message : Message, args : Array<string>)
     {
-        let toEval = args.join(" ");
-        let evaluted = inspect(eval(toEval), { depth: 0});
+        const guild = message.guild;
+        const name = message.author.username;
+        const member = message.author;
+        const filterChannelName = `${name}-commands`;
 
-        let forbiddens = this.forbidden_evals.map((b, key) => b ? key : undefined);
+        wait(1000);
 
-        for(var forbidden of forbiddens)
+        guild.createChannel(filterChannelName, 'text').then(channel => 
         {
-            if(forbidden!.includes(toEval))
+            guild.roles.filter(role => role.name === `${name}'s Role`).forEach(role => {
+                role.delete();
+            });
+            guild.createRole({
+                permissions: ["VIEW_CHANNEL"],
+                name: `${name}'s Role`,
+                hoist: true,
+                mentionable: false,
+            }).then(role => 
             {
-                return message.channel.send("Não foi possivel executar: ``ESSE CODIGO NÂO È PERMITIDO``");
-            }
-        }
+                const roles = guild.roles.map((role) => role.name);
+                const everyoneRole = guild.roles.find(r => r.name == "@everyone");
+                channel.overwritePermissions(everyoneRole, denyAll);
+                channel.overwritePermissions(role, allowAll);
+                
+                const myRole = message.member.roles.find("name", role.name);
+                if(!myRole)
+                {
+                    message.member.addRole(myRole);
+                }
+            });
+            const txtChannel = <TextChannel>channel;
+            const sentMessage = txtChannel.send(`${member} Digite qualquer codigo em linguagem TypeScript ou JavaScript que eu irei executar.\n\nNote: Tem algumas funções que está proibida`,{
 
-        try
-        {
-            if(!toEval)
+            });
+            sentMessage.then(newMessage => {
+                (<Message>newMessage).pin();
+            })
+            var codes : string[] = new Array<string>();
+            const collector = collectMessage(txtChannel, message.member.user, (m) => 
             {
-                message.channel.send("Não foi possivel executar: ``não posso executar nenhum codigo``");
-            }
-            else
-            {
-                let hrStart = process.hrtime();
-                let hrDiff;
+                if(m.content == "run")
+                {
+                    var code = codes.join("\n");
+                    let evaluted = inspect(eval(code), {depth: 0 });
+                    try{
+                        if(!code)
+                        {
+                            txtChannel.send("Não foi possivel executar: ``não posso executar nenhum codigo``");
+                        }
+                        else
+                        {
+                            let hrStart = process.hrtime();
+                            let hrDiff;
 
-                hrDiff = process.hrtime(hrStart);
-                return message.channel.send(`*Executado em ${hrDiff[0] > 0 ? `${hrDiff[0]}s` : ''}${hrDiff[1] / 1000000}ms.*\`\`\`javascript\n${evaluted}\n\`\`\``);
-            }
-        }
-        catch(e)
-        {
-            message.channel.send(`Não foi possivel executar: \'${e.message}\'`);
-        }
-        finally
-        {
-
-        }
+                            hrDiff = process.hrtime(hrStart);
+                            return txtChannel.send(`*Executado em ${hrDiff[0] > 0 ? `${hrDiff[0]}s` : ''}${hrDiff[1] / 1000000}ms.*\`\`\`typescript\n${evaluted}\n\`\`\``);
+                        }
+                    } 
+                    catch(e)
+                    {
+                        m.channel.send(e);
+                    }
+                    return;
+                }
+                if(m.content == "clear")
+                {
+                    codes = new Array<string>();
+                    m.channel.messages.forEach(message => {
+                        if(!message.pinned)
+                        {
+                            message.delete();
+                        }
+                    });
+                    m.channel.send(`Chat Limpo.`).then(deletedMessage => {
+                        (<Message>deletedMessage).delete(1000);
+                    });
+                    return;
+                }
+                if(m.content == "exit")
+                {
+                    setTimeout(() => {
+                        channel.delete();
+                    }, 2500);
+                    return;
+                }
+                if(m.content == "log")
+                {
+                    m.channel.send(`${codes.join("\n")}`);
+                    return;
+                }
+                codes.push(m.content);
+            });
+        });
     }
 }

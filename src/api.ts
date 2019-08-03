@@ -10,6 +10,7 @@ import passport2 = require('passport-discord');
 import passportDiscord = require('passport-discord');
 import Strategy = passportDiscord.Strategy;
 import { IBotConfig } from "iBotConfig";
+import { CommandInterface } from "iBotInterfaces";
 export interface ILoggerMethod {
     (msg: string, ...args: any[]): void
     (obj: object, msg?: string, ...args: any[]): void
@@ -177,7 +178,7 @@ export function CodeBlock(text: string, type?: string)
     }
     return "```" + text + "```";
 }
-export abstract class Command
+export abstract class Command implements CommandInterface
 {
     client : IBot
     conf!: IBotCommandConfig;
@@ -232,9 +233,8 @@ export abstract class Command
         return {required, optional};
     }
 
-    run(message : Message, args: string[])
-    {
-
+    run(message: Message, args: any[]): void {
+        throw new Error("Method not implemented.");
     }
 }
 

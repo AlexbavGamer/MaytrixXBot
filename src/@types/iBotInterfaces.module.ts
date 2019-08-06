@@ -1,4 +1,3 @@
-
 declare module "iBotInterfaces"
 {
     import { Message } from "discord.js";

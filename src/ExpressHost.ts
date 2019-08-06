@@ -60,10 +60,6 @@ export default class ExpressHost {
         this.app.set('view engine', 'ejs');
         this.app.set('views', join(__dirname, '/express/views'));
         this.app.set('layout', join(__dirname, '/express/layouts/layout'));
-        const _webpack = new webpack({
-            features: [],
-            output: "/"
-        });
         this.app.use(cookieSession({
             maxAge: 24 * 60 * 60 * 1000,
             keys: [this.bot.config.cookie.key]

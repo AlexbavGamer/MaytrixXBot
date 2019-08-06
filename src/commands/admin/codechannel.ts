@@ -2,6 +2,9 @@ import { IBot, Command, IBotCommandConfig, IBotMessage, Eval, CodeBlock } from '
 import {collectMessage, onCollectMessage, denyAll, allowAll} from '../../utils';
 import { Message, Client, CategoryChannel, DiscordAPIError, RichEmbed, MessageReaction, Collection, Collector, PermissionResolvable, TextChannel, PermissionObject, GuildChannel, GuildMember, User } from 'discord.js';
 import { inspect, promisify, isNull } from 'util';
+import { json } from 'body-parser';
+import { writeFile } from 'fs';
+import { IBotConfig } from 'iBotInterfaces';
 const wait = promisify(setTimeout);
 
 type ActionCommand = (user: User, channel : TextChannel, args : Array<any>) => void;
@@ -37,7 +40,7 @@ export default class CodeChannelCommand extends Command
             if(this.autorun.has(user.id))
             {
                 this.autorun.set(user.id, !(this.autorun.get(user.id)));
-                channel.send(`AutoRun: ${(this.autorun.get(user.id) ? "ATIVADO" : "DESATIVADO")}`);
+                channel.send(`toggle: ${(this.autorun.get(user.id) ? "**ATIVADO**" : "**DESATIVADO**")}`);
             }
         });
         this.actions.set("help", (user, channel, args) => {
@@ -58,6 +61,8 @@ export default class CodeChannelCommand extends Command
         });
     }
 
+    shutdown = () => { return 'você foi enganado' }
+
     async run(message : Message, args : Array<string>)
     {
         const guild = message.guild;
@@ -67,7 +72,7 @@ export default class CodeChannelCommand extends Command
 
         if(!this.autorun.has(member.id))
         {
-            this.autorun.set(member.id, false);
+            this.autorun.set(member.id, true);
         }  
 
         guild.channels.filter(f => f.name == filterChannelName).forEach(channel => {
@@ -104,7 +109,9 @@ export default class CodeChannelCommand extends Command
             const embed = new RichEmbed()
             .setFooter(`para ver os comandos use: help`);
             var description = `Olá <@${member.id}>, bem vindo a instrução de como usar o **Code Channel**`;
-            description += "\n" + "digite **Toggle** para ativar o auto run";
+            description += "\n" + "digite **toggle** para ativar o auto run";
+            description += "\n" + "digite **clear** para limpar o chat";
+            // description += "\n" + "digite **** para ";
             embed.setDescription(description);
             const sentMessage = txtChannel.send(embed);
             sentMessage.then(newMessage => {
@@ -137,6 +144,40 @@ export default class CodeChannelCommand extends Command
                         {
                             let hrStart = process.hrtime();
                             let hrDiff;
+
+                            if(executedCode == "this.client.config" || executedCode == "this.client._config")
+                            {
+                                let cfg = require('../../../bot.json') as IBotConfig
+                                cfg.token = '';
+                                cfg.clientId = '';
+                                cfg.clientSecret = '';
+                                cfg.Mongoose.url = '';
+                                cfg.youtubeapi = '';
+                                evaluted = JSON.stringify(cfg, null, 2);
+                            }
+
+                            else if(executedCode.match(/this.client.config.([A-z])\w+ = "(.+)"/g))
+                            {
+                                let cfg = require('../../../bot.json') as IBotConfig
+                                const tmp = executedCode.replace("this.client.config.", "");
+                                
+                                const tmp_ = tmp.split("=").map(tmp => {
+                                    return tmp.replace('"', "").replace('"', "").trim();
+                                });
+                                let key = tmp_[0];
+                                let value = tmp_[1];
+                                let change = JSON.parse(JSON.stringify(cfg, null, 2));
+                                change[key] = value;
+                                writeFile(`${__dirname}/../../../bot.json`, JSON.stringify(change, null, 2), {encoding: 'utf8'}, (err) => {
+                                    if(err)
+                                    {
+                                        return txtChannel.send(err.message);
+                                    }
+                                });
+                                this.client.config = cfg;
+                                evaluted = JSON.stringify(change, null, 2);
+                                console.log(evaluted);
+                            }
 
                             hrDiff = process.hrtime(hrStart);
                             return txtChannel.send(`*Executado em ${hrDiff[0] > 0 ? `${hrDiff[0]}s` : ''}${hrDiff[1] / 1000000}ms.*\`\`\`typescript\n${evaluted}\n\`\`\``);

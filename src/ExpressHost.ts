@@ -75,8 +75,8 @@ export default class ExpressHost {
             this.app!.locals.botClient = this.bot;
         });
         var discordStrat = new Strategy({
-            clientID: this.bot.config.clientId!,
-            clientSecret: this.bot.config.clientSecret!,
+            clientID: eval(this.bot.config.clientId!),
+            clientSecret: eval(this.bot.config.clientSecret!),
             callbackURL: "/auth/discord/callback",
             scope: ['identify', 'email', 'guilds', 'guilds.join']
         }, (accessToken, refreshToken, profile, done) => {

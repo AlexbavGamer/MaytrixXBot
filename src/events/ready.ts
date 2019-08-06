@@ -23,7 +23,7 @@ export default class Ready extends Event
             {
                 let active = this.client.config.activitys![Math.floor(Math.random() * this.client.config.activitys!.length)];
                 const result = inspect(eval(active), { depth: 0 }).replace("'", '').replace("'", "");
-                this.client.client.user.setActivity(result, { type: "STREAMING" });
+                this.client.client.user.setActivity(result, { type: "PLAYING" });
             }, 1000);
         }
         if (this.client.config.username && this.client.client.user.username !== this.client.config.username) 

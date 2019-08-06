@@ -2,6 +2,8 @@ import { IBot, ILogger } from './api'
 import { IBotConfig } from "iBotInterfaces";
 import { Bot } from './bot.module';
 
+require('dotenv').config();
+
 const logger: ILogger = console
 
 let cfg = require('./../bot.json') as IBotConfig

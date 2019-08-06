@@ -140,7 +140,7 @@ export interface IBot {
     readonly events: Collection<string, Event>;
     
     botId: string;
-    readonly config: IBotConfig;
+    config: IBotConfig;
 
     readonly commandreactions: Collection<string, CommandReaction>;
 
@@ -179,6 +179,9 @@ export function CodeBlock(text: string, type?: string)
 }
 export abstract class Command implements CommandInterface
 {
+    run(message: Message, args: any[]): void {
+        throw new Error("Method not implemented.");
+    }
     client : IBot
     conf!: IBotCommandConfig;
     cooldown: Set<User>;
@@ -232,9 +235,6 @@ export abstract class Command implements CommandInterface
         return {required, optional};
     }
 
-    run(message: Message, args: any[]): void {
-        throw new Error("Method not implemented.");
-    }
 }
 
 export interface IUser {

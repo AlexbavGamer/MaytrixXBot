@@ -90,7 +90,7 @@ export class Bot implements IBot {
 
         this._client = new discord.Client();
 
-        this._client.login(this._config.token);
+        this._client.login(eval(this._config.token));
 
         this.express = new ExpressHost(this);
         this.express.start();

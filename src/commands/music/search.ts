@@ -1,3 +1,4 @@
+'use strict';
 import { IBot, Command, IBotCommandConfig, IBotMessage } from '../../api'
 import { Message, Client, CategoryChannel, DiscordAPIError, RichEmbed, MessageReaction, Collection, CollectorFilter, MessageEmbed } from 'discord.js';
 import { inspect } from 'util';
@@ -30,22 +31,18 @@ export default class extends Command
         });
     }
 
-    async run(message: Message, args : Array<string>)
-    {
-        if(args.length == 0)
-        {
-            return message.reply(`Use: ${this.client.config.prefix}${this.conf.help.name} <${this.conf.help.usage}>`);
-        }
-        var searchString = args.join(" ");
+    run(message: Message, args: any[]): void {
+        const { songName } : any = args;
         var opts : youtubeSearch.YouTubeSearchOptions = {
             maxResults: 10,
             key: this.client.config.youtubeapi
         };
-        
-        youtubeSearch(searchString, opts, (err, res) => {
+
+        youtubeSearch(songName, opts, (err, res) => 
+        {
             if(err)
             {
-                return message.channel.send(`Erro: ${err.message}`);
+                return message.channel.send(err);
             }
 
             let videos = res!.slice(0, 10);

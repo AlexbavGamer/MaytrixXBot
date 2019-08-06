@@ -9,8 +9,8 @@
     "scripts": {
         "watch": "node_modules/.bin/tsc -w",
         "build": "node_modules/.bin/tsc",
-        "start": "node dist/index.js",
-        "dev": "ts-node-dev --ignore-watch bot.json --respawn src/index.ts -"
+        "start": "ts-node src/index.ts",
+        "dev": "ts-node-dev --ignore-watch bot.json --respawn src/index.ts"
     },
     "keywords": [],
     "author": "Alexsandre <Alexsandrebav2016@gmail.com> (https://github.com/AlexbavGamer)",

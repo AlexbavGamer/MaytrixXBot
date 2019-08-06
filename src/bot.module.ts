@@ -6,6 +6,7 @@ import ExpressHost from './ExpressHost';
 import { readFile, exists } from 'fs';
 
 export class Bot implements IBot {
+    static instance : Bot;
     getCommandsFromCategory(Category: string): Command[] {
         let Commands: Command[] = [];
 
@@ -77,7 +78,9 @@ export class Bot implements IBot {
         });
     }
 
-    public start(logger: ILogger, config: IBotConfig, commandsPath: string, eventsPath: string) {
+    public start(logger: ILogger, config: IBotConfig, commandsPath: string, eventsPath: string) 
+    {
+        Bot.instance = this;
         this._logger = logger;
         this._config = config;
 

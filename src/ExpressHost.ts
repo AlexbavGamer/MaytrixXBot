@@ -10,7 +10,6 @@ import UserModel from "./mongoose/schemas/User.model";
 import { IBot, fileWalker, ExpressPost, ExpressRoute } from "./api";
 import express = require("express");
 import { Strategy } from "passport-discord";
-import webpack = require('monaco-editor-webpack');
 
 export default class ExpressHost {
     bot: IBot;

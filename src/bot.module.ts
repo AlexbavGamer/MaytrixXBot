@@ -2,6 +2,7 @@ import * as discord from 'discord.js'
 import * as path from 'path'
 import { IBot, ILogger, fileWalker, Command, CommandReaction, Event } from './api'
 import { IBotConfig } from "iBotInterfaces";
+import { Connect } from "./mongoose/Connect";
 import ExpressHost from './ExpressHost';
 import { readFile, exists } from 'fs';
 
@@ -98,7 +99,10 @@ export class Bot implements IBot {
         this.express = new ExpressHost(this);
         this.express.start();
 
-        if (config.Mongoose.enabled) {
+        var Connection !: Connect; 
+        if (config.Mongoose.enabled) 
+        {
+            Connection = new Connect(config.Mongoose.url);
         }
 
 

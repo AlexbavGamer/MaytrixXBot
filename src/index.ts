@@ -1,8 +1,9 @@
 import { IBot, ILogger } from './api'
+// import { IBotConfig } from "iBotInterfaces";
 import { IBotConfig } from "iBotInterfaces";
 import { Bot } from './bot.module';
 
-require('dotenv').config();
+require("dotenv").config();
 
 const logger: ILogger = console
 

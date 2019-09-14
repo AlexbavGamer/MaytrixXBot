@@ -1,17 +1,25 @@
 {
     "defaultSeverity": "error",
     "extends": [
-        "tslint:recommended"
+        "tslint:recommended",
+        "tslint-react",
+        "tslint-config-prettier"
     ],
-    "jsRules": {},
-    "rules": {
+    "jsRules": {
+    },
+    "rules": 
+    {
+        "ordered-imports":
+        [
+            false
+        ],
         "eofline": false,
         "indent": [
             true,
             "spaces",
             4
         ],
-        "object-literal-sort-keys": false,
+        "object-literal-sort-keys": [false],
         "quotemark": [
             true,
             "single"
@@ -27,6 +35,7 @@
         "no-empty": false,
         "no-console": false,
         "max-classes-per-file": false,
+        
         "variable-name": [
             true,
             "ban-keywords",

@@ -6,8 +6,9 @@ declare module "iBotInterfaces"
     {
         run(message : Message, args: Array<any>) : void;
     }
-
-    export interface IBotConfig {
+    
+    export interface IBotConfig
+    {
         token: string;
         prefix: string;
         creatorId: string;

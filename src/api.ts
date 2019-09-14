@@ -1,5 +1,5 @@
-'use strict';
-import { readdir, stat, read, readFile, exists } from "fs";
+'use strict'
+import { readdir, stat, read, readFile, exists } from 'fs';
 import { resolve, join } from "path";
 import { Permissions, Message, Client, User, Collection, CategoryChannel, PermissionString, ReactionEmoji, PermissionObject, PermissionResolvable, Channel, ClientUserGuildSettings, ClientUserSettings, Emoji, Guild, GuildMember, Snowflake, MessageReaction, RateLimitInfo, Role, UserResolvable, TextChannel, ClientUser, UserConnection } from "discord.js";
 import { EventEmitter } from "events";

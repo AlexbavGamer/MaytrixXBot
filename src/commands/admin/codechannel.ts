@@ -1,8 +1,8 @@
-import { IBot, Command, IBotCommandConfig, IBotMessage, Eval, CodeBlock } from '../../api'
+import { IBotMessage } from 'MaytrixAPI';
+import { IBot, Command, IBotCommandConfig, Eval, CodeBlock } from '../../@types/Maytrix'
 import {collectMessage, onCollectMessage, denyAll, allowAll} from '../../utils';
 import { Message, Client, CategoryChannel, DiscordAPIError, RichEmbed, MessageReaction, Collection, Collector, PermissionResolvable, TextChannel, PermissionObject, GuildChannel, GuildMember, User } from 'discord.js';
 import { inspect, promisify, isNull } from 'util';
-import { json } from 'body-parser';
 import { writeFile } from 'fs';
 import { IBotConfig } from 'iBotInterfaces';
 const wait = promisify(setTimeout);

@@ -1,4 +1,4 @@
-import { IBot, ILogger } from './api'
+import { IBot, ILogger } from 'MaytrixAPI';
 // import { IBotConfig } from "iBotInterfaces";
 import { IBotConfig } from "iBotInterfaces";
 import { Bot } from './bot.module';

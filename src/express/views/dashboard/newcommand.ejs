@@ -1,8 +1,6 @@
 <%- contentFor('body') %>
-
 <link rel="stylesheet" data-name="vs/editor/editor.main" href="/node_modules/monaco-editor/min/vs/editor/editor.main.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<!-- <form method="POST" name="newCommand" action="/newcommand" > -->
 <table>
     <tr>
         <td>
@@ -24,19 +22,30 @@
         <td>
             <input type="button" value="Criar" onclick="createCommand()">
         </td>
-        <div id="container" style="width:500px;height:300px;border:1px solid grey"></div>
+        <div id="container" style="
+        width: 100%;
+        height: 78.5vh;
+        border:1px solid grey;
+        "></div>
     </tr>
 </table>
-<!-- </form> -->
 <script src="/node_modules/monaco-editor/min/vs/loader.js"></script>
+<script src="/js/ejs.min.js"></script>
 <script>
     
+    function runEval()
+    {
+        $.ajax({ url: '/runeval', type: 'POST', data: {
+            codes: editor.getModel().getLinesContent()
+        }});
+    }
+
     function createCommand()
     {
         $.ajax({ url: '/newcommand', type: 'POST', data:{
             code: editor.getModel().getLinesContent(),
             guildid: document.getElementById('guilds').value,
-            filename: 'typescript.ts',
+            filename: document.getElementById("filename").value,
             enabled: true
         }});
     }
@@ -49,39 +58,81 @@
 
         monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
             target: monaco.languages.typescript.ScriptTarget.ES6,
-	        allowNonTsExtensions: true
+            allowNonTsExtensions: true,
+            esModuleInterop: true,
         });
 
         monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
             target: monaco.languages.typescript.ScriptTarget.ES2016,
             allowNonTsExtensions: true,
             module: monaco.languages.typescript.ModuleKind.CommonJS,
-            noEmit: true
+            noEmit: true,
+            esModuleInterop: true,
         });
-
-        var n;
-        var f;
-        console.clear();
+        var parsed = {
+            key: "",
+            value: ""
+        };
         <% data.dependencies.forEach((value, key) => { %>
-            n = <%- JSON.stringify(value) %>
-            f = <%- JSON.stringify(key) %>
-            monaco.languages.typescript.typescriptDefaults.addExtraLib(n, f)
-        <% }) %>
+            parsed.value = <%- JSON.stringify(value) %>
+            parsed.key = <%- JSON.stringify(key) %>
+            monaco.languages.typescript.typescriptDefaults.addExtraLib(parsed.value, parsed.key);
+        <% }); %>
 
         // extra libraries
 
-        var jsCode = [
-            '"use strict";',
-            '',
-            "class Chuck implements ICommand {",
-            "    greet() {",
-            "        return Facts.next();",
-            "    }",
-            "}"
-        ].join('\n');
+
+        var jsCode = 
+        [
+            'import { Command, IBot, IBotCommandConfig } from "MaytrixAPI";',
+            'import { Message, Channel, Guild, } from "discord.js";',
+            'export default class MyCommand extends Command',
+            '{',
+            '\tconstructor(client : IBot)',
+            '\t{',
+                '\t\tsuper(client,',
+                '\t\t{',
+                '\t\t\taliases: ["MUDE AQUI"],',
+                '\t\t\tallowDMs: false,',
+                '\t\t\tautodelete: 1000,',
+                '\t\t\tcooldown: 1000,',
+                '\t\t\thelp:',
+                '\t\t\t{',
+                '\t\t\t\tcategory: "MUDE AQUI",',
+                '\t\t\t\tname: "MUDE AQUI",',
+                '\t\t\t\tusage: "MUDE AQUI",',
+                '\t\t\t\tdescription: "MUDE AQUI"',
+                '\t\t\t},',
+                '\t\t\tpermission: {',
+                '\t\t\t\tlevel: ["READ_MESSAGES"],',
+                '\t\t\t\tcreatorOnly: false',
+                '\t\t\t}',
+                '\t\t});',
+            '\t}',
+
+            '\t',
+
+            '\trun(message : Message, args : Array<any>)',
+            '\t{',
+            '\t\t',
+            '\t}',
+            '}',
+        ].join("\n");
 
         editor = monaco.editor.create(document.getElementById("container"), {
             model: monaco.editor.createModel(jsCode,"typescript"), 
+        });
+
+        editor.addAction({
+            id: "Run Code",
+            label: "Run any code",
+            run: (ed) => {
+                runEval();
+            },
+            keybindings: 
+            [
+                monaco.KeyMod.chord(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_B)
+            ],
         });
 
         editor.addAction({

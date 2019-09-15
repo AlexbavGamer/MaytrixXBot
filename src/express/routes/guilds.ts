@@ -1,4 +1,4 @@
-import { ExpressRoute } from '../../api'
+import { ExpressRoute } from '../../@types/Maytrix'
 import { Application, Response } from 'express';
 import { Guild, Collection, Snowflake } from 'discord.js';
 import CommandSchema from '../../mongoose/schemas/Command.model';

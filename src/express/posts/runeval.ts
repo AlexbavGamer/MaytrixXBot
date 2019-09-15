@@ -6,11 +6,12 @@ import { stringify } from 'querystring';
 import ICommand from '../../mongoose/schemas/Command.interface';
 import CommandModel from '../../mongoose/schemas/Command.model';
 import * as Mongoose from 'mongoose';
+import * as ts from 'typescript';
 
 export default class extends ExpressPost
  {
     constructor(app: Application) {
-        super(app, "/newcommand", (req, res, next) => 
+        super(app, "/runeval", (req, res, next) => 
         {
             if (req.isAuthenticated()) {
                 next();
@@ -33,21 +34,10 @@ export default class extends ExpressPost
 
     async run(req: Request, res: Response)
     {
-        const enabled : boolean = req.body.enabled;
-        const filename : string = req.body.filename;
-        const guildid : string = req.body.guildid;
-        const code : [string] = req.body.code;
+        let code : string = req.body.codes.join("\n");
+        let result = ts.transpile(code);
+        let runnable : any = eval(result);
 
-        if(filename.endsWith('.ts'))
-        {
-            var Command = new CommandModel({
-                guildid: guildid,
-                filename: filename,
-                code: code,
-                enabled: enabled
-            }).save().then(value => {
-                console.log(value);
-            });
-        }
+        console.log(runnable);
     }
 }

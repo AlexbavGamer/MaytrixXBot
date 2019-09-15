@@ -287,6 +287,7 @@ form{
 .main {
 	display: flex;
 	flex-flow: row wrap;
+	height: 100%;
 }
 .widget {
 	flex-basis: 300px;

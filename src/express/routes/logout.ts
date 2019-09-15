@@ -1,4 +1,4 @@
-import {ExpressRoute, isAuthenticated} from '../../api'
+import {ExpressRoute, isAuthenticated} from '../../@types/Maytrix'
 import { Application, Response, Request } from 'express';
 
 export default class extends ExpressRoute

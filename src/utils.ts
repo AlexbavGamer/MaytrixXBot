@@ -1,4 +1,4 @@
-import { IUser } from './api'
+import { IUser } from './@types/Maytrix'
 import { Message, User, MessageReaction, Collector, PermissionObject, TextChannel } from 'discord.js';
 import { promisify } from 'util';
 

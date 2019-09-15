@@ -1,6 +1,6 @@
-import * as discord from 'discord.js'
-import * as path from 'path'
-import { IBot, ILogger, fileWalker, Command, CommandReaction, Event } from './api'
+import * as discord from 'discord.js';
+import * as path from 'path';
+import { IBot, ILogger, fileWalker, Command, CommandReaction, Event } from './@types/Maytrix';
 import { IBotConfig } from "iBotInterfaces";
 import { Connect } from "./mongoose/Connect";
 import ExpressHost from './ExpressHost';

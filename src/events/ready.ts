@@ -1,4 +1,4 @@
-import { Event, IBot, Eval } from "../api";
+import { Event, IBot, Eval } from "../@types/Maytrix";
 import { Message, Guild, Collection } from "discord.js";
 import { inspect } from "util";
 import { read } from "fs";

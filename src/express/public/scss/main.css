@@ -244,7 +244,8 @@ form {
 /* main box container */
 .main {
   display: flex;
-  flex-flow: row wrap; }
+  flex-flow: row wrap;
+  height: 100%; }
 
 .widget {
   flex-basis: 300px;

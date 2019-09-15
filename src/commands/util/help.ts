@@ -1,6 +1,6 @@
-import { IBot, Command, IBotCommandConfig, IBotMessage, CodeBlock, DoubleQuotes } from '../../api'
+import { IBot, Command, IBotCommandConfig, CodeBlock, DoubleQuotes } from '../../@types/Maytrix'
+import { IBotMessage } from 'MaytrixAPI';
 import { Message, Client, CategoryChannel, DiscordAPIError, RichEmbed, MessageReaction, ReactionEmoji, User, ReactionCollector, ReactionCollectorOptions, Emoji } from 'discord.js';
-import { SSL_OP_NETSCAPE_DEMO_CIPHER_CHANGE_BUG } from 'constants';
 export default class HelpCommand extends Command 
 {
     constructor(client : IBot)

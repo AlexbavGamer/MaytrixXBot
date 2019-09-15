@@ -4,7 +4,7 @@ declare module "iBotInterfaces"
 
     export interface CommandInterface
     {
-        run(message : Message, args: Array<any>) : void;
+        run(message : Message, args: any[]) : void;
     }
     
     export interface IBotConfig
@@ -26,5 +26,5 @@ declare module "iBotInterfaces"
         youtubeapi?: string;
         clientSecret?: string;
         activitys?: string[];
-    }    
+    }
 }

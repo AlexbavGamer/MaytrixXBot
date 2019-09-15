@@ -1,4 +1,5 @@
-import { IBot, Command, IBotCommandConfig, IBotMessage } from '../../api'
+import { IBot, Command, IBotCommandConfig } from '../../@types/Maytrix'
+import { IBotMessage } from 'MaytrixAPI';
 import { Message, VoiceConnection, Client, CategoryChannel, DiscordAPIError, RichEmbed, MessageReaction, Collection, CollectorFilter, MessageEmbed } from 'discord.js';
 import { inspect } from 'util';
 import { timingSafeEqual } from 'crypto';

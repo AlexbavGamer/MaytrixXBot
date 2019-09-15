@@ -1,4 +1,5 @@
-import {ExpressRoute, isAuthenticated, fileWalker, default as getDependencies} from '../../../api'
+import {ExpressRoute, isAuthenticated, fileWalker, default as getDependencies} from '../../../@types/Maytrix'
+import { getDefaultCommand } from "../../../@types/Maytrix";
 import { Application, Response } from 'express';
 import { Collection, Snowflake, Guild } from 'discord.js';
 import * as path from 'path';
@@ -40,7 +41,7 @@ export default class extends ExpressRoute
         this.dependencies.set(filePath, code);
     }
     
-    run(req : Request, res: Response)
+    async run(req : Request, res: Response)
     {
         const guilds: Collection<Snowflake, Guild> = res.app.locals.botClient.client.guilds;
         res.render('dashboard/newcommand',
@@ -52,7 +53,7 @@ export default class extends ExpressRoute
             data:
             {
                 guilds: guilds,
-                dependencies: this.dependencies
+                dependencies: this.dependencies,
             },
             req: req
         });

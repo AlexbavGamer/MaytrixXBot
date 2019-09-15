@@ -1,5 +1,5 @@
 'use strict'
-import { readdir, stat, read, readFile, exists } from 'fs';
+import { readdir, stat, read, readFile, exists, existsSync } from 'fs';
 import { resolve, join } from "path";
 import { Permissions, Message, Client, User, Collection, CategoryChannel, PermissionString, ReactionEmoji, PermissionObject, PermissionResolvable, Channel, ClientUserGuildSettings, ClientUserSettings, Emoji, Guild, GuildMember, Snowflake, MessageReaction, RateLimitInfo, Role, UserResolvable, TextChannel, ClientUser, UserConnection } from "discord.js";
 import { EventEmitter } from "events";
@@ -14,42 +14,64 @@ export interface ILoggerMethod {
     (msg: string, ...args: any[]): void
     (obj: object, msg?: string, ...args: any[]): void
 }
-export type depCallback = (filePath : string, code : string) => any;
-export default function getDependencies(cb : depCallback)
-{
-    const Dependencies : Array<string> = new Array<string>();
-    const tmp_dep = Object.keys(require('../package.json').dependencies);
-    tmp_dep.forEach(dep => 
-    {
-        const depPackagePath = join(__dirname, "../", "node_modules/", dep, "/package.json");
-        const depPath = join(__dirname, "../", "node_modules/", dep);
 
-        readFile(depPackagePath, { encoding: 'utf8' }, (err, data) => {
+// MONACO EDITOR IMPORTS
+export type depCallback = (filePath : string, code : string) => any;
+export default async function getDependencies(cb : depCallback)
+{
+    const tmp_dep = Object.keys(require('../../package.json').dependencies);
+    const p = tmp_dep.forEach((dep) => 
+    {
+        const packagePath = join(__dirname, "../../", "node_modules", dep);
+        const typingsFolder = join(packagePath, "typings");
+        const rootPath = join(__dirname, "../../", "node_modules", dep);
+
+        const projectTypings = join(__dirname);
+
+        if(dep.match("@types"))
+        {
+            if(existsSync(rootPath))
+            {
+                fileWalker(rootPath, (err, files) => {
+                    if(err)
+                    {
+                        return console.log(err);
+                    }
+                    files!.forEach(file => {
+                        readFile(file, 'utf-8', (err, data) => {
+                            if(err) return console.log(err);
+                            cb(file, data);
+                        });
+                    });
+                }, [".d.ts"]);
+            }
+        }
+        if(existsSync(typingsFolder))
+        {
+            const typingsIndexFile = join(typingsFolder, "index.d.ts");
+            if(existsSync(typingsIndexFile))
+            {
+                readFile(typingsIndexFile, 'utf-8', (err, data) => {
+                    if(err) return console.log(err);
+                    cb(typingsIndexFile, data);
+                });
+            }
+        }
+        fileWalker(projectTypings, (err, files) => {
             if(err)
             {
                 return console.log(err);
             }
-            const packageData = JSON.parse(data);
-            var {name, main} = packageData;
-            if(!main)
-            {
-                main = "index.d.ts";
-            }
-
-            if(main)
-            {
-                exists(join(depPath, main), (exists => {
-                    if(exists)
-                    {
-                        const filePath = join(depPath, main);
-                        readFile(filePath, {encoding: 'utf8'}, (err, fileCode) => {
-                            cb(`../../../../../node_modules/${dep}/${main}`, fileCode);
-                        });
-                    }
-                }));
-            }
-        });
+            files!.forEach(file => {
+                readFile(file, 'utf-8', (err, data) => {
+                    if(err) return console.log(err);
+                    cb(file, data);
+                });
+            });
+        }, [".ts"]);
     });
+    await Promise.resolve(p);
+    
 }
 
 export function isAuthenticated(req : express.Request, res : express.Response, next : Function) : boolean
@@ -164,6 +186,14 @@ export abstract class Event
     }
 }
 
+export function getDefaultCommand()
+{
+    readFile(join(__dirname, "../express/bot/example_command.ts"), 'utf-8', (err, data) => {
+        if(err) { return console.log(err); }
+        return data.split("\n");
+    });
+}
+
 export function DoubleQuotes(text: string)
 {
     return "||" + text + "||";
@@ -266,42 +296,35 @@ export function fileWalker(dir : string, done : DoneFunction, includes?: string[
 
         if(!pending) return done(null, results);
 
-        list.forEach((file) => {
+        list.forEach((file) => 
+        {
             file = resolve(dir, file);
 
             stat(file, (err, stat) => {
                 if(stat && stat.isDirectory())
                 {
-                    fileWalker(file, (err, res) => {
+                    fileWalker(file, (err, res) => 
+                    {
                         results = results.concat(res);
                         if(!--pending) done(null, results);
                     });
                 }
                 else
                 {
-                    results.push(file);
+                    if(includes == undefined)
+                    {
+                        results.push(file);
+                    }
+                    else
+                    {
+                        if(includes!.some(e => file.endsWith(e)))
+                        {
+                            results.push(file);
+                        }
+                    }
                     if(!--pending) done(null, results);
                 }
             });
         });
     });
-}
-
-type MessageColor =
-    [number, number, number]
-    | number
-    | string
-
-export interface IBotMessage {
-    readonly user: IUser
-    setTextOnly(text: string): IBotMessage
-    addField(name: string, value: string): IBotMessage
-    addBlankField(): IBotMessage
-    setColor(color: MessageColor): IBotMessage
-    setDescription(description: string): IBotMessage
-    setFooter(text: string, icon?: string): IBotMessage
-    setImage(url: string): IBotMessage
-    setThumbnail(url: string): IBotMessage
-    setTitle(title: string): IBotMessage
-    setURL(url: string): IBotMessage
 }

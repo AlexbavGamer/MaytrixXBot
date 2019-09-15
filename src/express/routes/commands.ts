@@ -1,4 +1,4 @@
-import {ExpressRoute, isAuthenticated, Command} from '../../api'
+import {ExpressRoute, isAuthenticated, Command} from '../../@types/Maytrix'
 import { Application, Response } from 'express';
 import CommandModel from '../../mongoose/schemas/Command.model';
 import ICommand from '../../mongoose/schemas/Command.interface';

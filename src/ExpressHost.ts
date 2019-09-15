@@ -7,7 +7,7 @@ import cookieSession = require('cookie-session');
 import passport = require('passport');
 import IUser2 from './mongoose/schemas/User.interface';
 import UserModel from "./mongoose/schemas/User.model";
-import { IBot, fileWalker, ExpressPost, ExpressRoute } from "./api";
+import { IBot, fileWalker, ExpressPost, ExpressRoute } from "./@types/Maytrix";
 import express = require("express");
 import { Strategy } from "passport-discord";
 

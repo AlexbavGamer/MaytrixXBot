@@ -1,0 +1,30 @@
+import { Command, IBot, IBotCommandConfig } from "MaytrixAPI";
+import { Message, Channel, Guild, } from "discord.js";
+export default class extends Command
+{
+    constructor(client : IBot)
+    {
+        super(client, {
+            aliases: ["MUDE AQUI"],
+            allowDMs: false,
+            autodelete: 1000,
+            cooldown: 1000,
+            help:
+            {
+                category: "MUDE AQUI",
+                name: "MUDE AQUI",
+                usage: "MUDE AQUI",
+                description: "MUDE AQUI"
+            },
+            permission: {
+                level: [],
+                creatorOnly: false
+            }
+        });
+    }
+
+    run(message : Message, args : Array<any>)
+    {
+
+    }
+}

@@ -1,5 +1,5 @@
 import { RichEmbed } from 'discord.js'
-import { IBotMessage, IUser } from './api'
+import { IBotMessage, IUser } from './@types/Maytrix'
 
 export class BotMessage implements IBotMessage {
     public readonly user: IUser

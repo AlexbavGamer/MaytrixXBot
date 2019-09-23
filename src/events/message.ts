@@ -1,6 +1,8 @@
-import { Event, IBot, CodeBlock } from "../@types/Maytrix";
+import { IBotEvent, CodeBlock } from "../@types/Maytrix";
 import * as Discord from 'discord.js';
-export default class Message extends Event
+import { IBot } from "Maytrix";
+export default class Message extends IBotEvent
+
 {
     constructor(client : IBot)
     {

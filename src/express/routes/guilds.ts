@@ -1,10 +1,10 @@
-import { ExpressRoute } from '../../@types/Maytrix'
-import { Application, Response } from 'express';
-import { Guild, Collection, Snowflake } from 'discord.js';
+import { ExpressRoute, hasPermission } from '../../@types/Maytrix'
+import { Guild, Collection, Snowflake, SnowflakeUtil, GuildMember, PermissionResolvable } from 'discord.js';
 import CommandSchema from '../../mongoose/schemas/Command.model';
 import { stringify } from 'querystring';
 import ICommand from '../../mongoose/schemas/Command.interface';
-
+import { Application, Response } from 'express';
+import IUser from 'src/mongoose/schemas/User.interface';
 export default class extends ExpressRoute 
 {
     Commands: Collection<String, Array<ICommand>> = new Collection<String, Array<ICommand>>();
@@ -29,10 +29,11 @@ export default class extends ExpressRoute
                 });
             }
         });
-        
     }
 
-    async run(req: Request, res: Response) 
+
+        
+    async run(req: Express.Request, res: Response) 
     {
         CommandSchema.find({}, (err : NodeJS.ErrnoException, data) => {
             if(err)
@@ -54,7 +55,11 @@ export default class extends ExpressRoute
                 }
             });
         });
-        const guilds: Collection<Snowflake, Guild> = res.app.locals.botClient.client.guilds;
+        var user : IUser = <IUser>req.user;
+        var guilds : Collection<Snowflake, Guild> = (<Collection<Snowflake, Guild>>res.app.locals.botClient.client.guilds).filter(g => g.ownerID == req.user.id || hasPermission(g.members.get(user.id)!, ["MANAGE_ROLES_OR_PERMISSIONS"]));
+        var members = guilds.map(g => g.members.array());
+
+        
         res.render('guilds',
             {
                 req: req,

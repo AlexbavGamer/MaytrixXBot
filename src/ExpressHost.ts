@@ -5,12 +5,13 @@ import sassMiddleware = require('node-sass-middleware');
 import session = require('express-session');
 import cookieSession = require('cookie-session');
 import passport = require('passport');
-import IUser2 from './mongoose/schemas/User.interface';
+import IUserB from './mongoose/schemas/User.interface';
 import UserModel from "./mongoose/schemas/User.model";
-import { IBot, fileWalker, ExpressPost, ExpressRoute } from "./@types/Maytrix";
+import { fileWalker, ExpressPost, ExpressRoute } from "./@types/Maytrix";
 import express = require("express");
 import { Strategy } from "passport-discord";
-
+import { Mongoose, SchemaType, SchemaTypes } from "mongoose";
+import { IBot } from "Maytrix";
 export default class ExpressHost {
     bot: IBot;
     app?: express.Application;
@@ -74,35 +75,36 @@ export default class ExpressHost {
             clientSecret: eval(this.bot.config.clientSecret!),
             callbackURL: "/auth/discord/callback",
             scope: ['identify', 'email', 'guilds', 'guilds.join']
-        }, (accessToken, refreshToken, profile, done) => {
-            const update = function () {
-                UserModel.findOne({ id: profile.id }, (err, user) => {
-                    if (err) {
-                        done(err);
+        }, (_accessToken, _refreshToken, profile, done) => {
+            
+            var update = () => {
+                UserModel.findOne({
+                    'id': profile.id
+                }, function(err, user)
+                {
+                    if(err)
+                    {
+                        return done(err);
                     }
-                    if (!user) {
-                        const User = UserModel.create({
+                    if(!user)
+                    {
+                        user = new UserModel({
                             id: profile.id,
                             username: profile.username,
                             email: profile.email,
                             tag: profile.discriminator,
-                            accessToken: accessToken,
-                            refreshToken: refreshToken,
-                        }).then(user => {
-                            user.save();
-                            done(err, user);
+                            accessToken: _accessToken,
+                            refreshToken: _refreshToken,
+                        });
+                        user.save(function(err)
+                        {
+                            if(err) return console.log(err);
+                            return done(err, <IUserB>user);
                         });
                     }
-                    else {
-                        const update = {
-                            accessToken: accessToken,
-                            refreshToken: refreshToken
-                        };
-                        UserModel.findOneAndUpdate({ id: user.id }, update, (err, res) => {
-                            done(err, <IUser2>res);
-                        }).then(user => {
-                            done(null, <IUser2>user);
-                        });
+                    else
+                    {
+                        return done(err, user);
                     }
                 });
             };
@@ -122,11 +124,11 @@ export default class ExpressHost {
         }));
         this.app.use(passport.initialize());
         this.app.use(passport.session());
-        passport.serializeUser((user: IUser2, done) => {
+        passport.serializeUser((user: IUserB, done) => {
             done(null, user);
         });
         passport.deserializeUser(function (id, done) {
-            UserModel.findById(id, (err, user: IUser2) => {
+            UserModel.findById(id, (err, user: IUserB) => {
                 done(err, user);
             });
         });
@@ -139,10 +141,11 @@ export default class ExpressHost {
             scope: ['identify', 'email', 'guilds', 'guilds.join'],
         }));
         this.app.get('/auth/discord/callback', (req, res, next) => {
-            passport.authenticate("discord", { failureRedirect: "/auth/fail" }, (err, user: IUser2, info) => {
+            passport.authenticate("discord", { failureRedirect: "/auth/fail" }, (err, user: IUserB, info) => {
                 req.login(user, (err) => {
                     return res.redirect('/guilds');
                 });
+                req.session 
             })(req, res, next);
         });
         this.app.use(bodyParser());

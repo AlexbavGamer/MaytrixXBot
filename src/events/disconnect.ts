@@ -1,10 +1,11 @@
-import { Event, IBot, Eval } from "../@types/Maytrix";
+import { IBotEvent, Eval } from "../@types/Maytrix";
 import { Message, Guild, Collection } from "discord.js";
 import { inspect } from "util";
 import { read } from "fs";
-import CodeChannelCommand from "../commands/admin/codechannel";
+import { IBot } from "Maytrix";
+// import CodeChannelCommand from "../commands/admin/codechannel";
 
-export default class Disconnect extends Event
+export default class Disconnect extends IBotEvent
 {
     constructor(client : IBot)
     {
@@ -13,8 +14,8 @@ export default class Disconnect extends Event
 
     on()
     {
-        CodeChannelCommand.CodeChannels.forEach((channel) => {
-            channel.delete();
-        });
+        // CodeChannelCommand.CodeChannels.forEach((channel) => {
+        //     channel.delete();
+        // });
     }
 }

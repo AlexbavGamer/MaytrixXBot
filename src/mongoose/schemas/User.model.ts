@@ -4,12 +4,12 @@ import IUser from './User.interface';
 
 var UserSchema: mongoose.Schema<IUser> = new mongoose.Schema<IUser>
 ({
-    id: { type : String, required: true, unique: true},
-    username: {type : String, unique: true},
-    email: {type : String, unique: true},
-    tag: {type: String, unique: true},
-    accessToken: {type: String, unique: true},
-    refreshToken: {type: String, unique: true}
+    id: {type : String},
+    username: {type : String},
+    email: {type : String},
+    tag: {type: String},
+    accessToken: {type: String},
+    refreshToken: {type: String}
 })
 
 export default mongoose.model<IUser>("User", UserSchema);

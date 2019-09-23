@@ -1,9 +1,10 @@
-import { Event, IBot, Eval } from "../@types/Maytrix";
+import { IBotEvent, Eval } from "../@types/Maytrix";
 import { Message, Guild, Collection } from "discord.js";
 import { inspect } from "util";
 import { read } from "fs";
+import { IBot } from "Maytrix";
 
-export default class Ready extends Event
+export default class Ready extends IBotEvent
 {
     static servers: any;
     constructor(client : IBot)

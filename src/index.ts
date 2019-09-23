@@ -1,7 +1,10 @@
-import { IBot, ILogger } from 'MaytrixAPI';
-// import { IBotConfig } from "iBotInterfaces";
-import { IBotConfig } from "iBotInterfaces";
+import * as moduleAlias from "module-alias";
+
+moduleAlias.default(__dirname + "../../package.json");
+
+
 import { Bot } from './bot.module';
+import { IBotConfig, ILogger } from "Maytrix";
 
 require("dotenv").config();
 

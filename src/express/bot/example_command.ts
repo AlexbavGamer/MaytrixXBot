@@ -1,6 +1,7 @@
-import { Command, IBot, IBotCommandConfig } from "MaytrixAPI";
-import { Message, Channel, Guild, } from "discord.js";
-export default class extends Command
+import { Command } from "@api/Maytrix";
+import { IBot, IBotCommandConfig } from "Maytrix";
+import { Message, Channel, Guild } from "discord.js";
+export default class MyCommand extends Command
 {
     constructor(client : IBot)
     {

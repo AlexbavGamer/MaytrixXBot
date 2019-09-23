@@ -20,6 +20,9 @@
         </td>
 
         <td>
+            <input type="checkbox">
+                Comando Global
+            </input>
             <input type="button" value="Criar" onclick="createCommand()">
         </td>
         <div id="container" style="
@@ -79,48 +82,35 @@
             monaco.languages.typescript.typescriptDefaults.addExtraLib(parsed.value, parsed.key);
         <% }); %>
 
-        // extra libraries
 
-
-        var jsCode = 
-        [
-            'import { Command, IBot, IBotCommandConfig } from "MaytrixAPI";',
-            'import { Message, Channel, Guild, } from "discord.js";',
-            'export default class MyCommand extends Command',
-            '{',
-            '\tconstructor(client : IBot)',
-            '\t{',
-                '\t\tsuper(client,',
-                '\t\t{',
-                '\t\t\taliases: ["MUDE AQUI"],',
-                '\t\t\tallowDMs: false,',
-                '\t\t\tautodelete: 1000,',
-                '\t\t\tcooldown: 1000,',
-                '\t\t\thelp:',
-                '\t\t\t{',
-                '\t\t\t\tcategory: "MUDE AQUI",',
-                '\t\t\t\tname: "MUDE AQUI",',
-                '\t\t\t\tusage: "MUDE AQUI",',
-                '\t\t\t\tdescription: "MUDE AQUI"',
-                '\t\t\t},',
-                '\t\t\tpermission: {',
-                '\t\t\t\tlevel: ["READ_MESSAGES"],',
-                '\t\t\t\tcreatorOnly: false',
-                '\t\t\t}',
-                '\t\t});',
-            '\t}',
-
-            '\t',
-
-            '\trun(message : Message, args : Array<any>)',
-            '\t{',
-            '\t\t',
-            '\t}',
-            '}',
-        ].join("\n");
-
+        var jsCode = `<%- data.command %>`;
         editor = monaco.editor.create(document.getElementById("container"), {
-            model: monaco.editor.createModel(jsCode,"typescript"), 
+            model: monaco.editor.createModel(jsCode,"typescript"),
+            theme: "vs-dark",
+            autoIndent: true
+        });
+
+        editor.addAction({
+            id: "Restart Template",
+            label: "Restart",
+            run: (ed) => {
+                ed.setValue(`<%- data.command %>`);
+            },
+            keybindings:
+            [
+                monaco.KeyMod.chord(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_R )
+            ]
+        });
+        editor.addAction({
+            id: "Save",
+            label: "Save Command",
+            run: (ed) => {
+                alert("Não é possivel salvar ainda. <%= req.user.username %>");
+            },
+            keybindings:
+            [
+                monaco.KeyMod.chord(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S )
+            ]
         });
 
         editor.addAction({
@@ -134,7 +124,10 @@
                 monaco.KeyMod.chord(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_B)
             ],
         });
-
+        document.getElementById("filename").value = getCommandName();
+        editor.onDidChangeModelContent(e => {
+            document.getElementById("filename").value = getCommandName();
+        });
         editor.addAction({
             id: "get-mirror-model-uris",
             label: "Debug monaco: Get worker models",
@@ -152,7 +145,6 @@
         });
 
     });
-
-
 </script>
 
+<script src="/js/monaco_util.js"></script>

@@ -1,6 +1,6 @@
 'use strict'
-import { readdir, stat, read, readFile, exists, existsSync } from 'fs';
-import { resolve, join } from "path";
+import { readdir, stat, read, readFile, exists, existsSync, readFileSync } from 'fs';
+import { resolve, join, basename } from "path";
 import { Permissions, Message, Client, User, Collection, CategoryChannel, PermissionString, ReactionEmoji, PermissionObject, PermissionResolvable, Channel, ClientUserGuildSettings, ClientUserSettings, Emoji, Guild, GuildMember, Snowflake, MessageReaction, RateLimitInfo, Role, UserResolvable, TextChannel, ClientUser, UserConnection } from "discord.js";
 import { EventEmitter } from "events";
 import * as express from 'express';
@@ -9,15 +9,76 @@ import { inspect } from "util";
 import passport2 = require('passport-discord');
 import passportDiscord = require('passport-discord');
 import Strategy = passportDiscord.Strategy;
-import { CommandInterface , IBotConfig} from "iBotInterfaces";
-export interface ILoggerMethod {
-    (msg: string, ...args: any[]): void
-    (obj: object, msg?: string, ...args: any[]): void
+import { Application } from 'express';
+import { RequestHandler } from 'express-serve-static-core';
+import { IBotConfig, IBot, IBotCommandInterface, IBotCommandConfig } from "Maytrix";
+
+export class ExpressPost
+{
+    app?: Application;
+    routeName?: string;
+    handlers?: RequestHandler[];
+    constructor(app : Application, route: string, ...handlers: RequestHandler[])
+    {
+        this.app = app;
+        this.routeName = route;
+        this.handlers = handlers;
+    }
+
+    
+    run(...args : Array<any>)
+    {
+
+    }
 }
 
-// MONACO EDITOR IMPORTS
+export class ExpressSubdomain
+{
+    app?: Application;
+    routeName?: string;
+    handlers?: RequestHandler[];
+    constructor(app : Application, route: string, ...handlers: RequestHandler[])
+    {
+
+    }
+}
+
+
+export class ExpressRoute
+{
+    app?: Application;
+    routeName?: string;
+    handlers?: RequestHandler[];
+    constructor(app : Application, route: string, ...handlers: RequestHandler[])
+    {
+        this.app = app;
+        this.routeName = route;
+        this.handlers = handlers;
+    }
+
+    run(...args : Array<any>)
+    {
+
+    }
+}
+
+export function hasPermission(member : GuildMember, permission : PermissionResolvable)
+{
+    if(!member)
+    {
+        return false;
+    }
+    return member.hasPermission(permission);
+}
+
+export function Eval(code : string)
+{
+    return inspect(eval(code), {depth : 0});
+}
+
+
 export type depCallback = (filePath : string, code : string) => any;
-export default async function getDependencies(cb : depCallback)
+export async function getDependencies(cb : depCallback)
 {
     const tmp_dep = Object.keys(require('../../package.json').dependencies);
     const p = tmp_dep.forEach((dep) => 
@@ -65,7 +126,7 @@ export default async function getDependencies(cb : depCallback)
             files!.forEach(file => {
                 readFile(file, 'utf-8', (err, data) => {
                     if(err) return console.log(err);
-                    cb(file, data);
+                    cb("@api/" + basename(file), data);
                 });
             });
         }, [".ts"]);
@@ -74,105 +135,7 @@ export default async function getDependencies(cb : depCallback)
     
 }
 
-export function isAuthenticated(req : express.Request, res : express.Response, next : Function) : boolean
-{
-    if(req.isAuthenticated())
-    {
-        return true;
-    }
-    return false;
-}
-
-export class ExpressPost
-{
-    app?: express.Application;
-    routeName?: string;
-    handlers?: express.RequestHandler[];
-    constructor(app : express.Application, route: string, ...handlers: express.RequestHandler[])
-    {
-        this.app = app;
-        this.routeName = route;
-        this.handlers = handlers;
-    }
-
-    
-    run(...args : Array<any>)
-    {
-
-    }
-}
-
-export class ExpressRoute
-{
-    app?: express.Application;
-    routeName?: string;
-    handlers?: express.RequestHandler[];
-    constructor(app : express.Application, route: string, ...handlers: express.RequestHandler[])
-    {
-        this.app = app;
-        this.routeName = route;
-        this.handlers = handlers;
-    }
-
-    run(...args : Array<any>)
-    {
-
-    }
-}
-
-export function Eval(code : string)
-{
-    return inspect(eval(code), {depth : 0});
-}
-
-export interface ILogger {
-    debug: ILoggerMethod
-    info: ILoggerMethod
-    warn: ILoggerMethod
-    error: ILoggerMethod
-}
-
-export interface IBotCommandConfig
-{
-    cooldown: number | 1000
-    aliases: string[]
-    allowDMs: boolean
-    autodelete: number | boolean | undefined
-    help: 
-    {
-        name: string | ""
-        description: string | "No information specified."
-        usage: string | ""
-        category: string | "Information"
-    }
-    permission:
-    {
-        level: PermissionResolvable,
-        creatorOnly: string | boolean | [string]
-    }
-}
-
-export interface IBot {
-    readonly commands: Collection<string, Command>
-    readonly aliases: Collection<any, any>
-    readonly logger: ILogger
-    readonly allUsers: IUser[]
-    readonly onlineUsers: IUser[]
-    readonly client: Client;
-    readonly events: Collection<string, Event>;
-    
-    botId: string;
-    config: IBotConfig;
-
-    readonly commandreactions: Collection<string, CommandReaction>;
-
-    getCommandsFromCategory(Category : string) : Array<Command>
-
-    restart() : Promise<void>
-    start(logger: ILogger, config: IBotConfig, commandsPath: string, dataPath: string): void
-}
-
-export abstract class Event
+export abstract class IBotEvent
 {
     client! : IBot
     constructor(client : IBot)
@@ -188,10 +151,7 @@ export abstract class Event
 
 export function getDefaultCommand()
 {
-    readFile(join(__dirname, "../express/bot/example_command.ts"), 'utf-8', (err, data) => {
-        if(err) { return console.log(err); }
-        return data.split("\n");
-    });
+    return readFileSync(join(__dirname, "../express/bot/example_command.ts"), 'utf-8');
 }
 
 export function DoubleQuotes(text: string)
@@ -207,7 +167,9 @@ export function CodeBlock(text: string, type?: string)
     }
     return "```" + text + "```";
 }
-export abstract class Command implements CommandInterface
+
+
+export abstract class Command implements IBotCommandInterface
 {
     run(message: Message, args: any[]): void {
         throw new Error("Method not implemented.");
@@ -267,21 +229,9 @@ export abstract class Command implements CommandInterface
 
 }
 
-export interface IUser {
-    id: string
-    username: string
-    discriminator: string
-    tag: string
-}
+
 
 export type DoneFunction = (err : NodeJS.ErrnoException | string | null, files?: Array<string>) => void;
-
-export interface CommandReaction
-{
-    category?: string
-    reaction?: string | number,
-    commands?: Collection<string, Command> | null
-}
 
 
 

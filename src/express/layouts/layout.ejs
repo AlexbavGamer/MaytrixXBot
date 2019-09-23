@@ -23,13 +23,13 @@
             </div>
             <a href="#" class="nav-trigger"><span></span></a>
         </div>
-        <div class="left-logo">
+        <!-- <div class="left-logo">
             <% if(!req.isAuthenticated()) { %>
             <div class="discord">
-                <a class="btn btn-primary" href="/auth/discord/callback">Entrar</a>
+                <a class="btn btn-primary" href="">Entrar</a>
             </div>
             <% } %>
-        </div>
+        </div> -->
         <div class="side-nav">
             <div class="logo">
                 <i class="fab fa-discord"></i>
@@ -64,8 +64,15 @@
                     </li>
                     <li> 
                         <a href="/logout">
-                            <span><i class="fa fa-sign-out"></i></span>
-                            <span>Sair</span>
+                            <span><i class="fa fa-sign-out" style="color: #F00;"></i></span>
+                            <span style="color: #F00;">Sair</span>
+                        </a>
+                    </li>
+                    <% } else { %>
+                    <li>
+                        <a href="/auth/discord/callback">
+                            <span><i class="fa fa-sign-in"></i></span>
+                            <span>Entrar</span>
                         </a>
                     </li>
                     <% } %>

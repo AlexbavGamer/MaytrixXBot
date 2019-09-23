@@ -1,10 +1,11 @@
 import * as discord from 'discord.js';
 import * as path from 'path';
-import { IBot, ILogger, fileWalker, Command, CommandReaction, Event } from './@types/Maytrix';
-import { IBotConfig } from "iBotInterfaces";
+
+import { fileWalker, Command, IBotEvent } from '@api/Maytrix';
 import { Connect } from "./mongoose/Connect";
 import ExpressHost from './ExpressHost';
 import { readFile, exists } from 'fs';
+import { CommandReaction, IBotConfig, ILogger, IBot } from 'Maytrix';
 
 export class Bot implements IBot {
     static instance : Bot;
@@ -60,7 +61,7 @@ export class Bot implements IBot {
 
     private readonly _commands: discord.Collection<string, Command> = new discord.Collection();
     private readonly _aliases: discord.Collection<any, any> = new discord.Collection();
-    private readonly _events: discord.Collection<string, Event> = new discord.Collection();
+    private readonly _events: discord.Collection<string, IBotEvent> = new discord.Collection();
     private _commandreactions: discord.Collection<string, CommandReaction> = new discord.Collection();
     private _client!: discord.Client
     private _config!: IBotConfig
@@ -116,7 +117,7 @@ export class Bot implements IBot {
 
             files!.forEach(file => {
                 const eventClass = require(file).default
-                const event = new eventClass(this) as Event
+                const event = new eventClass(this) as IBotEvent
 
                 const eventName = path.basename(file).split('.')[0];
                 this.events.set(eventName, event);

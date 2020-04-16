@@ -7,10 +7,10 @@
     "description": "Simple discord bot",
     "main": "dist/index.js",
     "scripts": {
-        "dev": "ts-node-dev --ignore-watch bot.json --respawn src/index.ts",
-        "start": "ts-node src/index.ts",
-        "buildandrun": "tsc && npm run start",
-        "postinstall": "tsc"
+        "dev": "npx ts-node-dev --ignore-watch bot.json --respawn src/index.ts",
+        "start": "npx ts-node src/index.ts",
+        "buildandrun": "npx tsc && npm run start",
+        "postinstall": "npx tsc"
     },
     "keywords": [],
     "author": "Alexsandre <Alexsandrebav2016@gmail.com> (https://github.com/AlexbavGamer)",

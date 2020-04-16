@@ -4,7 +4,7 @@ moduleAlias.default(__dirname + "../../package.json");
 
 
 import { Bot } from './bot.module';
-import { IBotConfig, ILogger } from "Maytrix";
+import { IBotConfig, ILogger } from "../@types/maytrix.d";
 
 require("dotenv").config();
 
